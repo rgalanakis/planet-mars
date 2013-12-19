@@ -12,5 +12,5 @@ setup(name="planet-techart",
       url="http://www.robg3d.com/",
       license='Python',
       packages=["planet", "planet.tests"],
-      scripts=["planet.py", "planet-cache.py"],
+      scripts=["planet.py"],
       )
