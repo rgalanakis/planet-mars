@@ -1,5 +1,19 @@
-Planet
+Planet Tech Art
+---------------
+
+This is a fork of the Python planet software available at
+http://www.planetplanet.org/
+
+It has been modified in relatively small ways,
+to modernize and clean it out.
+
+Author
 ------
+
+Rob Galanakis <rob.galanakis@gmail.com>
+
+Original Planet Info
+--------------------
 
 Planet is a flexible feed aggregator. It downloads news feeds published by
 web sites and aggregates their content together into a single combined feed,
