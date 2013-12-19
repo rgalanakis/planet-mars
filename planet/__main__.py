@@ -2,22 +2,18 @@
 """The Planet aggregator.
 
 A flexible and easy-to-use aggregator for generating websites.
-
-Visit http://www.planetplanet.org/ for more information and to download
-the latest version.
-
-Requires Python 2.1, recommends 2.3.
 """
 
 
-import os
-import sys
+from ConfigParser import ConfigParser
 import locale
+import os
+import socket
+import sys
 import urlparse
 
 import planet
 
-from ConfigParser import ConfigParser
 
 # Default configuration file path
 CONFIG_FILE = "config.ini"
@@ -124,11 +120,6 @@ def main():
     except:
         log.warning = log.warn
 
-    # timeoutsocket allows feedparser to time out rather than hang forever on
-    # ultra-slow servers.  Python 2.3 now has this functionality available in
-    # the standard socket library, so under 2.3 you don't need to install
-    # anything.  But you probably should anyway, because the socket module is
-    # buggy and timeoutsocket is better.
     if feed_timeout:
         try:
             feed_timeout = float(feed_timeout)
@@ -137,18 +128,8 @@ def main():
             feed_timeout = None
 
     if feed_timeout and not offline:
-        try:
-            from planet import timeoutsocket
-            timeoutsocket.setDefaultSocketTimeout(feed_timeout)
-            log.debug("Socket timeout set to %d seconds", feed_timeout)
-        except ImportError:
-            import socket
-            if hasattr(socket, 'setdefaulttimeout'):
-                log.debug("timeoutsocket not found, using python function")
-                socket.setdefaulttimeout(feed_timeout)
-                log.debug("Socket timeout set to %d seconds", feed_timeout)
-            else:
-                log.error("Unable to set timeout to %d seconds", feed_timeout)
+        socket.setdefaulttimeout(feed_timeout)
+        log.debug("Socket timeout set to %d seconds", feed_timeout)
 
     # run the planet
     my_planet = planet.Planet(config)
