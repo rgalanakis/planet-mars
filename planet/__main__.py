@@ -12,7 +12,6 @@ Requires Python 2.1, recommends 2.3.
 
 import os
 import sys
-import time
 import locale
 import urlparse
 

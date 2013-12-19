@@ -22,7 +22,7 @@ __all__ = ("cache", "feedparser", "htmltmpl", "logging",
 
 import logging
 import os
-import md5
+from hashlib import md5
 import time
 import dbhash
 import re
@@ -67,7 +67,7 @@ NEW_DATE_FORMAT = "%B %d, %Y"
 ACTIVITY_THRESHOLD = 0
 
 class stripHtml(sgmllib.SGMLParser):
-    "remove all tags from the data"
+    """remove all tags from the data"""
     def __init__(self, data):
         sgmllib.SGMLParser.__init__(self)
         self.result=''
@@ -384,7 +384,7 @@ class Planet:
                     if channel.exclude:
                         channel_exclude_re = re.compile(channel.exclude,
                                                         re.I)
-                    if (planet_filter_re or planet_exclude_re \
+                    if (planet_filter_re or planet_exclude_re
                         or channel_filter_re or channel_exclude_re):
                         title = ""
                         if item.has_key("title"):
@@ -392,27 +392,27 @@ class Planet:
                         content = item.get_content("content")
 
                     if planet_filter_re:
-                        if not (planet_filter_re.search(title) \
+                        if not (planet_filter_re.search(title)
                                 or planet_filter_re.search(content)):
                             continue
 
                     if planet_exclude_re:
-                        if (planet_exclude_re.search(title) \
+                        if (planet_exclude_re.search(title)
                             or planet_exclude_re.search(content)):
                             continue
 
                     if channel_filter_re:
-                        if not (channel_filter_re.search(title) \
+                        if not (channel_filter_re.search(title)
                                 or channel_filter_re.search(content)):
                             continue
 
                     if channel_exclude_re:
-                        if (channel_exclude_re.search(title) \
+                        if (channel_exclude_re.search(title)
                             or channel_exclude_re.search(content)):
                             continue
 
                     if not seen_guids.has_key(item.id):
-                        seen_guids[item.id] = 1;
+                        seen_guids[item.id] = 1
                         items.append((time.mktime(item.date), item.order, item))
 
         # Sort the list
@@ -663,11 +663,11 @@ class Channel(cache.CachedInfo):
             elif key.endswith("_detail"):
                 # retain name and  email sub-fields
                 if feed[key].has_key('name') and feed[key].name:
-                    self.set_as_string(key.replace("_detail","_name"), \
-                        feed[key].name)
+                    self.set_as_string(key.replace("_detail","_name"),
+                                       feed[key].name)
                 if feed[key].has_key('email') and feed[key].email:
-                    self.set_as_string(key.replace("_detail","_email"), \
-                        feed[key].email)
+                    self.set_as_string(key.replace("_detail","_email"),
+                                       feed[key].email)
             elif key == "items":
                 # Ignore items field
                 pass
@@ -848,16 +848,17 @@ class NewsItem(cache.CachedInfo):
             elif key.endswith("_detail"):
                 # retain name, email, and language sub-fields
                 if entry[key].has_key('name') and entry[key].name:
-                    self.set_as_string(key.replace("_detail","_name"), \
-                        entry[key].name)
+                    self.set_as_string(key.replace("_detail","_name"),
+                                       entry[key].name)
                 if entry[key].has_key('email') and entry[key].email:
-                    self.set_as_string(key.replace("_detail","_email"), \
-                        entry[key].email)
-                if entry[key].has_key('language') and entry[key].language and \
-                   (not self._channel.has_key('language') or \
-                   entry[key].language != self._channel.language):
-                    self.set_as_string(key.replace("_detail","_language"), \
-                        entry[key].language)
+                    self.set_as_string(key.replace("_detail","_email"),
+                                       entry[key].email)
+                if (entry[key].has_key('language') and
+                    entry[key].language and
+                    (not self._channel.has_key('language') or
+                    entry[key].language != self._channel.language)):
+                    self.set_as_string(key.replace("_detail","_language"),
+                                       entry[key].language)
             elif key.endswith("_parsed"):
                 # Date fields
                 if entry[key] is not None:

@@ -148,7 +148,7 @@ class CachedInfo:
         else:
             return func(key, value)
 
-        if value == None:
+        if value is None:
             return self.set_as_null(key, value)
         else:
             try:
