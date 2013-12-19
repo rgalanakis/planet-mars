@@ -9,11 +9,13 @@ combined feed.
 __version__ = "2.0"
 
 # Modules available without separate import
+import sgmllib
+
 import cache
 import feedparser
 import sanitize
 import htmltmpl
-import sgmllib
+
 
 # Limit the effect of "from planet import *"
 __all__ = ("cache", "feedparser", "htmltmpl", "logging",
@@ -734,10 +736,10 @@ class Channel(cache.CachedInfo):
                 entry_id = cache.utf8(entry.link)
             elif entry.has_key("title"):
                 entry_id = (self.url + "/"
-                            + md5.new(cache.utf8(entry.title)).hexdigest())
+                            + md5(cache.utf8(entry.title)).hexdigest())
             elif entry.has_key("summary"):
                 entry_id = (self.url + "/"
-                            + md5.new(cache.utf8(entry.summary)).hexdigest())
+                            + md5(cache.utf8(entry.summary)).hexdigest())
             else:
                 log.error("Unable to find or generate id, entry ignored")
                 continue
@@ -830,7 +832,7 @@ class NewsItem(cache.CachedInfo):
 
         self._channel = channel
         self.id = id_
-        self.id_hash = md5.new(id_).hexdigest()
+        self.id_hash = md5(id_).hexdigest()
         self.date = None
         self.order = None
         self.content = None
