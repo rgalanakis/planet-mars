@@ -8,6 +8,16 @@ It will soon be modified to use Jinja2 instead of htmltmpl,
 and has been cleaned up in a number of other ways
 based on my experience using Planet.
 
+TODO
+----
+
+This package is not nearly finished.
+The two primary items are:
+
+- Convert to Jinja2
+- Remove the 'techart' stuff that was originall created for
+  tech-artists.org.
+
 Author
 ------
 
