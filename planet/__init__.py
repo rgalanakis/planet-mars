@@ -11,9 +11,10 @@ __version__ = "2.0"
 # Modules available without separate import
 import sgmllib
 
-import cache
 import feedparser
 import sanitize
+
+import cache
 import htmltmpl
 
 
@@ -636,8 +637,8 @@ class Channel(cache.CachedInfo):
         else:
             log.info("Updating feed %s", self.feed_information())
 
-        self.url_etag = info.has_key("etag") and info.etag or None
-        self.url_modified = info.has_key("modified") and info.modified or None
+        self.url_etag = info.get('etag')
+        self.url_modified = info.get('updated_parsed')
         if self.url_etag is not None:
             log.debug("E-Tag: %s", self.url_etag)
         if self.url_modified is not None:
