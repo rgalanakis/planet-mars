@@ -280,10 +280,10 @@ class TemplateManager:
                 msvcrt.locking(fd, msvcrt.LK_LOCK, 1)
             elif lock == LOCK_EX:
                 msvcrt.locking(fd, msvcrt.LK_LOCK, 1)
-            #elif lock == LOCK_UN:
-                #msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
-            #else:
-                #raise TemplateError, "BUG: bad lock in lock_file"
+            elif lock == LOCK_UN:
+                msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
+            else:
+                raise TemplateError, "BUG: bad lock in lock_file"
         else:
             raise TemplateError, "BUG: bad locktype in lock_file"
 
