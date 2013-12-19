@@ -47,6 +47,7 @@ def upload_files(ftppass):
 
 def copy_files(tgtdir):
     srcdir = 'techart/output'
+    shutil.rmtree(tgtdir)
     shutil.copytree(srcdir, tgtdir)
 
 
