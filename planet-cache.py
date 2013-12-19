@@ -1,13 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-"""Planet cache tool.
-
-"""
-
-__authors__ = [ "Scott James Remnant <scott@netsplit.com>",
-                "Jeff Waugh <jdub@perkypants.org>" ]
-__license__ = "Python"
-
+"""Planet cache tool."""
 
 import os
 import sys

@@ -6,12 +6,7 @@ This package is a library for developing web sites or software that
 aggregate RSS, CDF and Atom feeds taken from elsewhere into a single,
 combined feed.
 """
-
 __version__ = "2.0"
-__authors__ = [ "Scott James Remnant <scott@netsplit.com>",
-                "Jeff Waugh <jdub@perkypants.org>" ]
-__license__ = "Python"
-
 
 # Modules available without separate import
 import cache

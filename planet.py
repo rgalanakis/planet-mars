@@ -9,10 +9,6 @@ the latest version.
 Requires Python 2.1, recommends 2.3.
 """
 
-__authors__ = [ "Scott James Remnant <scott@netsplit.com>",
-                "Jeff Waugh <jdub@perkypants.org>" ]
-__license__ = "Python"
-
 
 import os
 import sys

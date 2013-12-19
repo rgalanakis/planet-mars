@@ -1,22 +1,16 @@
 #!/usr/bin/env python
 """The Planet Feed Aggregator"""
 
-import os
 from distutils.core import setup
+from planet import __version__
 
-from planet import __version__ as VERSION
-from planet import __license__ as LICENSE
-
-if 'PLANET_VERSION' in os.environ.keys():
-    VERSION = os.environ['PLANET_VERSION']
-
-setup(name="planet",
-      version=VERSION,
-      description="The Planet Feed Aggregator",
-      author="Planet Developers",
-      author_email="devel@lists.planetplanet.org",
-      url="http://www.planetplanet.org/",
-      license=LICENSE,
+setup(name="planet-techart",
+      version=__version__,
+      description="The Tech Art Planet Feed Aggregator",
+      author="Rob Galanakis",
+      author_email="rob.galanakis@gmail.com",
+      url="http://www.robg3d.com/",
+      license='Python',
       packages=["planet", "planet.tests"],
       scripts=["planet.py", "planet-cache.py"],
       )
