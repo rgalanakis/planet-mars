@@ -13,4 +13,8 @@ setup(name="planet-techart",
       license='Python',
       packages=["planet", "planet.tests"],
       scripts=["planet.py"],
-      )
+      install_requires=[
+          'feedparser',
+          'sanitize',
+          ]
+)
