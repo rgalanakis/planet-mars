@@ -1,11 +1,12 @@
-Planet Tech Art
+planet-jinja
 ---------------
 
 This is a fork of the Python planet software available at
 http://www.planetplanet.org/
 
-It has been modified in relatively small ways,
-to modernize and clean it out.
+It will soon be modified to use Jinja2 instead of htmltmpl,
+and has been cleaned up in a number of other ways
+based on my experience using Planet.
 
 Author
 ------
@@ -89,17 +90,17 @@ anyway.
 Inside these template files, <TMPL_VAR xxx> is replaced with the content
 of the 'xxx' variable.  The variables available are:
 
-	name	....	} the value of the equivalent options
-	link	....	} from the [Planet] section of your
-	owner_name .	} Planet's config.ini file
-	owner_email	}
+    name	....	} the value of the equivalent options
+    link	....	} from the [Planet] section of your
+    owner_name .	} Planet's config.ini file
+    owner_email	}
 
-	url	....	link with the output filename appended
-	generator ..	version of planet being used
+    url	....	link with the output filename appended
+    generator ..	version of planet being used
 
-	date	....	                         { your date format
-	date_iso ...	current date and time in { ISO date format
-	date_822 ...	                         { RFC822 date format
+    date	....	                         { your date format
+    date_iso ...	current date and time in { ISO date format
+    date_822 ...	                         { RFC822 date format
 
 
 There are also two loops, 'Items' and 'Channels'.  All of the lines of
@@ -110,52 +111,52 @@ and may be used as many times as you wish.
 The 'Channels' loop iterates all of the channels (feeds) defined in the
 configuration file, within it the following variables are available:
 
-	name	....	value of the 'name' option in config.ini, or title
-	title	....	title retreived from the channel's feed
-	tagline ....	description retreived from the channel's feed
-	link	....	link for the human-readable content (from the feed)
-	url	....	url of the channel's feed itself
+    name	....	value of the 'name' option in config.ini, or title
+    title	....	title retreived from the channel's feed
+    tagline ....	description retreived from the channel's feed
+    link	....	link for the human-readable content (from the feed)
+    url	....	url of the channel's feed itself
 
-	Additionally the value of any other option specified in config.ini
-	for the feed, or in the [DEFAULT] section, is available as a
-	variable of the same name.
+    Additionally the value of any other option specified in config.ini
+    for the feed, or in the [DEFAULT] section, is available as a
+    variable of the same name.
 
-	Depending on the feed, there may be a huge variety of other
-	variables may be available; the best way to find out what you
-	have is using the 'planet-cache' tool to examine your cache files.
+    Depending on the feed, there may be a huge variety of other
+    variables may be available; the best way to find out what you
+    have is using the 'planet-cache' tool to examine your cache files.
 
 The 'Items' loop iterates all of the blog entries from all of the channels,
 you do not place it inside a 'Channels' loop.  Within it, the following
 variables are available:
 
-	id	....	unique id for this entry (sometimes just the link)
-	link	....	link to a human-readable version at the origin site
+    id	....	unique id for this entry (sometimes just the link)
+    link	....	link to a human-readable version at the origin site
 
-	title	....	title of the entry
-	summary	....	a short "first page" summary
-	content	....	the full content of the entry
+    title	....	title of the entry
+    summary	....	a short "first page" summary
+    content	....	the full content of the entry
 
-	date	....	                              { your date format
-	date_iso ...	date and time of the entry in { ISO date format
-	date_822 ...                                  { RFC822 date format
+    date	....	                              { your date format
+    date_iso ...	date and time of the entry in { ISO date format
+    date_822 ...                                  { RFC822 date format
 
-	If the entry takes place on a date that has no prior entry has
-	taken place on, the 'new_date' variable is set to that date.
-	This allows you to break up the page by day.
+    If the entry takes place on a date that has no prior entry has
+    taken place on, the 'new_date' variable is set to that date.
+    This allows you to break up the page by day.
 
-	If the entry is from a different channel to the previous entry,
-	or is the first entry from this channel on this day
-	the 'new_channel' variable is set to the same value as the
-	'channel_url' variable.  This allows you to collate multiple
-	entries from the same person under the same banner.
+    If the entry is from a different channel to the previous entry,
+    or is the first entry from this channel on this day
+    the 'new_channel' variable is set to the same value as the
+    'channel_url' variable.  This allows you to collate multiple
+    entries from the same person under the same banner.
 
-	Additionally the value of any variable that would be defined
-	for the channel is available, with 'channel_' prepended to the
-	name (e.g. 'channel_name' and 'channel_link').
+    Additionally the value of any variable that would be defined
+    for the channel is available, with 'channel_' prepended to the
+    name (e.g. 'channel_name' and 'channel_link').
 
-	Depending on the feed, there may be a huge variety of other
-	variables may be available; the best way to find out what you
-	have is using the 'planet-cache' tool to examine your cache files.
+    Depending on the feed, there may be a huge variety of other
+    variables may be available; the best way to find out what you
+    have is using the 'planet-cache' tool to examine your cache files.
 
 
 There are also a couple of other special things you can do in a template.
