@@ -50,9 +50,9 @@ class CachedInfo(object):
         """Return the cache key name for the given key."""
         key = key.replace(" ", "_")
         if self._root:
-            return key
+            return str(key)
         else:
-            return self._id + " " + key
+            return str(self._id + " " + key)
 
     def cache_read(self):
         """Read information from the cache."""
