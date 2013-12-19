@@ -1,0 +1,164 @@
+body {
+    color: #eee;
+	background-color: black;
+	margin-left: 210px;
+    font-family: arial,sans-serif;
+    font-size: 90%;
+}
+
+table, th, td
+{
+    border: 1px solid #bbb;
+}
+
+a {
+    color: #ffbd69;
+}
+a:hover {
+    color: #ed9217;
+    text-decoration: underline !important;
+}
+a:visited {
+    color: #ffeacb
+}
+
+.logo {
+    margin-left: -180px;
+    margin-bottom: 20px;
+}
+
+.pagetitle {
+    font-size: xx-large;
+	color: #dedede;
+}
+
+.lastupdated {
+    font-size: 95%;
+    padding-left: 20px;
+}
+
+.dayheader {
+	font-size: larger;
+
+    margin: 20px 0 5px;
+
+	color: #ffae41;
+}
+
+.dayhr {
+    border-color: white;
+    border-width: 2px;
+}
+
+.authorheader {
+    font-size: large;
+	font-weight: bold;
+    text-decoration: remove-all;
+}
+
+.authorheader a {
+	text-decoration: none;
+	color: inherit;
+}
+
+.posthr {
+    border-color: #ccc;
+}
+
+h4 {
+	font-family: "Bitstream Vera Sans", sans-serif;
+	font-weight: bold;
+}
+
+h4 a {
+	text-decoration: none;
+	color: inherit;
+}
+
+img.face {
+	float: right;
+	margin-top: -3em;
+}
+
+.entry {
+	margin-bottom: 2em;
+}
+
+.entry .date {
+	font-family: "Bitstream Vera Sans", sans-serif;
+	color: #ffcd96;
+}
+
+.entry .date a {
+	text-decoration: none;
+	color: inherit;
+}
+
+.sidebar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 150px;
+
+    font-size: 95%;
+
+    padding: 110px 20px;
+}
+
+.sidebarheader {
+	font-size: 110%;
+	font-weight: bold;
+
+	padding-left: 5px;
+	margin-left: 0px;
+}
+
+.sidebar ul {
+	padding-left: 1em;
+	margin-left: 0px;
+
+	list-style-type: none;
+}
+
+.sidebar ul li:hover {
+	color: grey;
+}
+
+.sidebar ul li a {
+        text-decoration: none;
+}
+
+.sidebar ul li a:hover {
+        text-decoration: underline;
+}
+
+.sidebar ul li a img {
+        border: 0;
+}
+
+.sidebar p {
+	border-top: 1px solid grey;
+	margin-top: 30px;
+	padding-top: 10px;
+
+	padding-left: 5px;
+}
+
+.sidebar .message {
+    cursor: help;
+    border-bottom: 1px dashed red;
+}
+
+.sidebar a.message:hover {
+    cursor: help;
+	background-color: #ff0000;
+	color: #ffffff !important;
+	text-decoration: none !important;
+}
+
+
+.addyourself {
+    font-size: 70%;
+	font-style: italic;
+	margin-bottom: 12px;
+}

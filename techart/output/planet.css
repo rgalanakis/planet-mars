@@ -1,0 +1,185 @@
+body {
+    color: #ccc;
+	background-color: black;
+	margin-left: 210px;
+    font-family: arial,sans-serif;
+    font-size: 90%;
+    background-color: #111;
+}
+
+table, th, td
+{
+    border: 1px solid #bbb;
+}
+
+a {
+    color: #F5A422;
+}
+a:hover {
+    color: #ffbd69;
+    text-decoration: underline !important;
+}
+a:visited {
+    color: #F5A422
+}
+
+.logo {
+    margin-left: -210px;
+    margin-bottom: 20px;
+    margin-top: -8px;
+}
+
+.pagetitle {
+	font-size: xx-large;
+	color: white;
+	position: relative;
+	left: -200px;
+}
+
+.lastupdated {
+	font-size: 95%;
+	padding-left: 20px;
+	position: relative;
+	left: -210px;
+	padding-bottom: 10px;
+}
+
+.daygroup {
+	background-color: #222;
+	padding: 1px 10px 5px;
+}
+
+.dayheader {
+	font-size: larger;
+	margin: 10px 0px 0px;
+	color: #F5A422;
+	background-color: #444;
+	margin: 0px -15px;
+	padding: 5px 10px;
+	text-shadow: black 2px 2px 3px;
+}
+
+.dayhr {
+	border-color: black;
+	border-width: 2px;
+	margin: 0px -15px 10px;
+}
+
+.authorheader {
+    font-size: large;
+	font-weight: bold;
+    text-decoration: remove-all;
+    color: white;
+	font-style: italic;
+	text-shadow: black 2px 3px 7px;
+}
+
+.authorheader a {
+	text-decoration: none;
+}
+
+.posthr {
+    border-color: #ccc;
+}
+
+h4 {
+	font-family: "Bitstream Vera Sans", sans-serif;
+	font-weight: bold;
+	color: #F5A422;
+	position: relative;
+	top: -15px;
+	text-shadow: black 2px 2px 3px;
+}
+
+h4 a {
+	text-decoration: none;
+	color: inherit;
+}
+
+img.face {
+	float: right;
+	margin-top: -3em;
+}
+
+.entry {
+	margin-bottom: 2em;
+}
+
+.entry .date {
+	font-family: "Bitstream Vera Sans", sans-serif;
+	color: #ffcd96;
+}
+
+.entry .date a {
+	text-decoration: none;
+	color: inherit;
+}
+
+.sidebar {
+	position: absolute;	top: 37px;	left: 0;
+	width: 150px;
+	font-size: 95%;
+	padding: 120px 20px;
+}
+
+.sidebarheader {
+	font-size: 110%;
+	font-weight: bold;
+
+	padding-left: 5px;
+	margin-left: 0px;
+	display: none;
+}
+
+.sidebar ul {
+	padding-left: 4px;
+	margin-left: -10px;
+	margin-right: -30px;
+	list-style-type: none;
+	background: #222;
+}
+
+.sidebar ul li:hover {
+	color: grey;
+}
+
+.sidebar ul li a {
+        text-decoration: none;
+        line-height: 15px;
+}
+
+.sidebar ul li a:hover {
+        text-decoration: underline;
+}
+
+.sidebar ul li a img {
+        border: 0;
+}
+
+.sidebar p {
+	border-top: 1px solid grey;
+	margin-top: 30px;
+	padding-top: 10px;
+
+	padding-left: 5px;
+}
+
+.sidebar .message {
+    cursor: help;
+    border-bottom: 1px dashed red;
+}
+
+.sidebar a.message:hover {
+    cursor: help;
+	background-color: #ff0000;
+	color: #ffffff !important;
+	text-decoration: none !important;
+}
+
+
+.addyourself {
+    font-size: 70%;
+	font-style: italic;
+	margin-bottom: 12px;
+	color: white;
+}
