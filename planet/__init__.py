@@ -6,7 +6,8 @@ This package is a library for developing web sites or software that
 aggregate RSS, CDF and Atom feeds taken from elsewhere into a single,
 combined feed.
 """
-__version__ = "2.0"
+__version__ = "3.0"
+__url__ = 'https://github.com/rgalanakis/planet-techart'
 
 # Modules available without separate import
 import sgmllib
@@ -286,6 +287,7 @@ class Planet(object):
             tp.set("owner_name",  owner_name)
             tp.set("owner_email", owner_email)
             tp.set("url",         url)
+            tp.set("repo_url", __url__)
         
             if planet_feed:
                 tp.set("feed", planet_feed)

@@ -2,17 +2,17 @@
 """The Planet Feed Aggregator"""
 
 from distutils.core import setup
-from planet import __version__
+from planet import __version__, __url__
 
 setup(name="planet-techart",
       version=__version__,
       description="The Tech Art Planet Feed Aggregator",
       author="Rob Galanakis",
       author_email="rob.galanakis@gmail.com",
-      url="http://www.robg3d.com/",
+      url=__url__,
       license='Python',
       packages=["planet", "planet.tests"],
-      scripts=["planet.py"],
+      scripts=["make_techart.py"],
       install_requires=[
           'feedparser',
           'sanitize',
