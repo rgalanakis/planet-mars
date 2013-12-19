@@ -19,16 +19,13 @@ import feedparser
 import sanitize
 import htmltmpl
 import sgmllib
-try:
-    import logging
-except:
-    import compat_logging as logging
 
 # Limit the effect of "from planet import *"
 __all__ = ("cache", "feedparser", "htmltmpl", "logging",
            "Planet", "Channel", "NewsItem")
 
 
+import logging
 import os
 import md5
 import time

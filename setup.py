@@ -17,6 +17,6 @@ setup(name="planet",
       author_email="devel@lists.planetplanet.org",
       url="http://www.planetplanet.org/",
       license=LICENSE,
-      packages=["planet", "planet.compat_logging", "planet.tests"],
+      packages=["planet", "planet.tests"],
       scripts=["planet.py", "planet-cache.py", "runtests.py"],
       )
