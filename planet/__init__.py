@@ -96,7 +96,7 @@ def template_info(item, date_format):
     return info
 
 
-class Planet:
+class Planet(object):
     """A set of channels.
 
     This class represents a set of channels for which the items will

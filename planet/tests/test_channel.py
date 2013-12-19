@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 import unittest
-import planet
 import tempfile
 import ConfigParser
 
-class FakePlanet:
+import planet
+
+
+class FakePlanet(object):
     """
     A dummy Planet object that's enough to fool the
     Channel.__init__ method

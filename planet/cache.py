@@ -21,7 +21,7 @@ re_initial_cruft = re.compile(r'^[,.]*')
 re_final_cruft   = re.compile(r'[,.]*$')
 
 
-class CachedInfo:
+class CachedInfo(object):
     """Cached information.
 
     This class is designed to hold information that is stored in a cache

@@ -5,7 +5,7 @@ from htmlentitydefs import name2codepoint
 import re
 
 # select and apply an xml:base for this entry
-class relativize:
+class relativize(object):
   def __init__(self, parent):
     self.score = {}
     self.links = []
