@@ -72,10 +72,10 @@ def main():
         sys.exit(1)
 
     # Read the [Planet] config section
-    planet_name = config_get(config, "Planet", "name",        PLANET_NAME)
-    planet_link = config_get(config, "Planet", "link",        PLANET_LINK)
-    planet_feed = config_get(config, "Planet", "feed",        PLANET_FEED)
-    owner_name  = config_get(config, "Planet", "owner_name",  OWNER_NAME)
+    planet_name = config_get(config, "Planet", "name", PLANET_NAME)
+    planet_link = config_get(config, "Planet", "link", PLANET_LINK)
+    planet_feed = config_get(config, "Planet", "feed", PLANET_FEED)
+    owner_name  = config_get(config, "Planet", "owner_name", OWNER_NAME)
     owner_email = config_get(config, "Planet", "owner_email", OWNER_EMAIL)
     if verbose:
         log_level = "DEBUG"

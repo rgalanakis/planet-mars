@@ -9,33 +9,25 @@ combined feed.
 __version__ = "3.0"
 __url__ = 'https://github.com/rgalanakis/planet-techart'
 
-# Modules available without separate import
+import dbhash
+from hashlib import md5
+import logging
+import os
+import re
 import sgmllib
+import time
+from xml.sax.saxutils import escape
 
 import feedparser
 import sanitize
 
-import cache
-import htmltmpl
+from . import cache, htmltmpl
 
 
 # Limit the effect of "from planet import *"
 __all__ = ("cache", "feedparser", "htmltmpl", "logging",
            "Planet", "Channel", "NewsItem")
 
-
-import logging
-import os
-from hashlib import md5
-import time
-import dbhash
-import re
-
-try: 
-    from xml.sax.saxutils import escape
-except:
-    def escape(data):
-        return data.replace("&","&amp;").replace(">","&gt;").replace("<","&lt;")
 
 # Version information (for generator headers)
 VERSION = ("Planet/%s +http://www.planetplanet.org" % __version__)

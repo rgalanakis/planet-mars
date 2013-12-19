@@ -16,5 +16,6 @@ setup(name="planet-techart",
       install_requires=[
           'feedparser',
           'sanitize',
+          'jinja2',
           ]
 )
