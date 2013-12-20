@@ -21,45 +21,59 @@ def render_template(
         encoding,
         channels_list,
         items_list):
-    manager = htmltmpl.TemplateManager()
     log.info("Processing template %s", template_file)
+    
+    # We treat each template individually
+    base = os.path.splitext(os.path.basename(template_file))[0]
+    url = os.path.join(planet_link, base)
+    output_file = os.path.join(output_dir, base)
+    
+    date = time.gmtime()
+    kwargs = {
+        'Items': items_list,
+        'Channels': channels_list,
+        'generator': VERSION,
+        'name': planet_name,
+        'link': planet_link,
+        'owner_name': owner_name,
+        'owner_email': owner_email,
+        'url': url,
+        'repo_url': __url__,
+        'date': time.strftime(date_format, date),
+        'date_iso': time.strftime(TIMEFMT_ISO, date),
+        'date_822': time.strftime(TIMEFMT_822, date)
+    }
+        
+    if planet_feed:
+        kwargs['feed'] = planet_feed
+        kwargs['feedtype'] = planet_feed.find('rss')>=0 and 'rss' or 'atom'
+
+    if template_file.endswith('.tmpl'):
+        func = render_htmltmpl
+    else:
+        assert template_file.endswith('.html')
+        func = render_jinja
+    return func(template_file, output_file, encoding, kwargs)
+
+
+def render_htmltmpl(
+        template_file,
+        output_file,
+        encoding,
+        template_kwargs):
+    manager = htmltmpl.TemplateManager()
     try:
         template = manager.prepare(template_file)
     except htmltmpl.TemplateError:
         template = manager.prepare(os.path.basename(template_file))
 
-    # We treat each template individually
-    base = os.path.splitext(os.path.basename(template_file))[0]
-    url = os.path.join(planet_link, base)
-    output_file = os.path.join(output_dir, base)
-
     # Process the template
     tp = htmltmpl.TemplateProcessor(html_escape=0)
-    tp.set("Items", items_list)
-    tp.set("Channels", channels_list)
+    for key, val in template_kwargs.iteritems():
+        tp.set(key, val)
 
-    # Generic information
-    tp.set("generator", VERSION)
-    tp.set("name", planet_name)
-    tp.set("link", planet_link)
-    tp.set("owner_name", owner_name)
-    tp.set("owner_email", owner_email)
-    tp.set("url", url)
-    tp.set("repo_url", __url__)
-
-    if planet_feed:
-        tp.set("feed", planet_feed)
-        tp.set("feedtype", planet_feed.find('rss')>=0 and 'rss' or 'atom')
-
-    # Update time
-    date = time.gmtime()
-    tp.set("date", time.strftime(date_format, date))
-    tp.set("date_iso", time.strftime(TIMEFMT_ISO, date))
-    tp.set("date_822", time.strftime(TIMEFMT_822, date))
-
-    try:
-        log.info("Writing %s", output_file)
-        output_fd = open(output_file, "w")
+    log.info("Writing %s", output_file)
+    with open(output_file, "w") as output_fd:
         if encoding.lower() in ("utf-8", "utf8"):
             # UTF-8 output is the default because we use that internally
             output_fd.write(tp.process(template))
@@ -71,8 +85,7 @@ def render_template(
             # Must be a "known" encoding
             output = tp.process(template).decode("utf-8")
             output_fd.write(output.encode(encoding, "replace"))
-        output_fd.close()
-    except KeyboardInterrupt:
-        raise
-    except:
-        log.exception("Write of %s failed", output_file)
+
+
+def render_jinja(*args, **kwargs):
+    raise NotImplementedError()

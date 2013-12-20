@@ -221,8 +221,21 @@ class Planet(object):
         items_list = self.gather_items_info(channels)
 
         for template_file in template_files:
-            render.render_template(template_file, planet_name,
-                planet_link, planet_feed, owner_name, owner_email, output_dir, date_format, encoding, channels_list, items_list)
+            try:
+                render.render_template(
+                    template_file,
+                    planet_name,
+                    planet_link,
+                    planet_feed,
+                    owner_name,
+                    owner_email,
+                    output_dir,
+                    date_format,
+                    encoding,
+                    channels_list,
+                    items_list)
+            except Exception:
+                log.exception('Write failed for %s', template_file)
 
     def channels(self, hidden=0, sorted=1):
         """Return the list of channels."""
