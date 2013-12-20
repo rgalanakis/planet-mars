@@ -6,8 +6,6 @@ This package is a library for developing web sites or software that
 aggregate RSS, CDF and Atom feeds taken from elsewhere into a single,
 combined feed.
 """
-__version__ = "3.0"
-__url__ = 'https://github.com/rgalanakis/planet-techart'
 
 import dbhash
 from hashlib import md5
@@ -21,15 +19,8 @@ from xml.sax.saxutils import escape
 import feedparser
 import sanitize
 
-from . import cache, htmltmpl, render
-
-
-__all__ = ("cache", "feedparser", "htmltmpl", "logging",
-           "Planet", "Channel", "NewsItem")
-
-
-# Version information (for generator headers)
-VERSION = ("Planet/%s +http://www.planetplanet.org" % __version__)
+from . import cache, render
+from .constants import __version__, TIMEFMT_ISO, TIMEFMT_822, VERSION
 
 # Default User-Agent header to send when retreiving feeds
 USER_AGENT = VERSION + " " + feedparser.USER_AGENT
@@ -40,24 +31,17 @@ CACHE_DIRECTORY = "cache"
 # Default number of items to display from a new feed
 NEW_FEED_ITEMS = 10
 
-# Useful common date/time formats
-TIMEFMT_ISO = "%Y-%m-%dT%H:%M:%S+00:00"
-TIMEFMT_822 = "%a, %d %b %Y %H:%M:%S +0000"
 
 
 # Log instance to use here
-log = logging.getLogger("planet")
-try:
-    log.warning
-except:
-    log.warning = log.warn
+log = logging.getLogger(__name__)
 
 # Defaults for the template file config sections
-ENCODING        = "utf-8"
-ITEMS_PER_PAGE  = 60
-DAYS_PER_PAGE   = 0
-OUTPUT_DIR      = "output"
-DATE_FORMAT     = "%B %d, %Y %I:%M %p"
+ENCODING = "utf-8"
+ITEMS_PER_PAGE = 60
+DAYS_PER_PAGE = 0
+OUTPUT_DIR = "output"
+DATE_FORMAT = "%B %d, %Y %I:%M %p"
 NEW_DATE_FORMAT = "%B %d, %Y"
 ACTIVITY_THRESHOLD = 0
 
@@ -112,22 +96,16 @@ class Planet(object):
         self.filter = None
         self.exclude = None
 
-    def tmpl_config_get(self, template, option, default=None, raw=0, vars=None):
+    def tmpl_config_get(self, option, default=None, raw=0):
         """Get a template value from the configuration, with a default."""
-        if self.config.has_option(template, option):
-            return self.config.get(template, option, raw=raw, vars=None)
-        elif self.config.has_option("Planet", option):
+        if self.config.has_option("Planet", option):
             return self.config.get("Planet", option, raw=raw, vars=None)
-        else:
-            return default
+        return default
 
-    def gather_channel_info(self, template_file="Planet"):
-        date_format = self.tmpl_config_get(template_file,
-                                      "date_format", DATE_FORMAT, raw=1)
+    def gather_channel_info(self):
+        date_format = self.tmpl_config_get("date_format", DATE_FORMAT, raw=1)
 
-        activity_threshold = int(self.tmpl_config_get(template_file,
-                                            "activity_threshold",
-                                            ACTIVITY_THRESHOLD))
+        activity_threshold = int(self.tmpl_config_get("activity_threshold", ACTIVITY_THRESHOLD))
 
         if activity_threshold:
             activity_horizon = \
@@ -166,19 +144,15 @@ class Planet(object):
 
         return channels, channels_list
 
-    def gather_items_info(self, channels, template_file="Planet", channel_list=None):
+    def gather_items_info(self, channels, channel_list=None):
         items_list = []
         prev_date = []
         prev_channel = None
 
-        date_format = self.tmpl_config_get(template_file,
-                                      "date_format", DATE_FORMAT, raw=1)
-        items_per_page = int(self.tmpl_config_get(template_file,
-                                      "items_per_page", ITEMS_PER_PAGE))
-        days_per_page = int(self.tmpl_config_get(template_file,
-                                      "days_per_page", DAYS_PER_PAGE))
-        new_date_format = self.tmpl_config_get(template_file,
-                                      "new_date_format", NEW_DATE_FORMAT, raw=1)
+        date_format = self.tmpl_config_get("date_format", DATE_FORMAT, raw=1)
+        items_per_page = int(self.tmpl_config_get("items_per_page", ITEMS_PER_PAGE))
+        days_per_page = int(self.tmpl_config_get("days_per_page", DAYS_PER_PAGE))
+        new_date_format = self.tmpl_config_get("new_date_format", NEW_DATE_FORMAT, raw=1)
 
         for newsitem in self.items(max_items=items_per_page,
                                    max_days=days_per_page,
@@ -205,7 +179,6 @@ class Planet(object):
         return items_list
 
     def run(self, planet_name, planet_link, template_files, offline = False):
-        log = logging.getLogger("planet.runner")
 
         # Create a planet
         log.info("Loading cached data")
@@ -238,77 +211,18 @@ class Planet(object):
 
     def generate_all_files(self, template_files, planet_name,
                 planet_link, planet_feed, owner_name, owner_email):
-        
-        log = logging.getLogger("planet.runner")
-        # Go-go-gadget-template
+
+        # Read the configuration
+        output_dir = self.tmpl_config_get("output_dir", OUTPUT_DIR)
+        date_format = self.tmpl_config_get("date_format", DATE_FORMAT, raw=1)
+        encoding = self.tmpl_config_get("encoding", ENCODING)
+        # Gather information
+        channels, channels_list = self.gather_channel_info()
+        items_list = self.gather_items_info(channels)
+
         for template_file in template_files:
-            manager = htmltmpl.TemplateManager()
-            log.info("Processing template %s", template_file)
-            try:
-                template = manager.prepare(template_file)
-            except htmltmpl.TemplateError:
-                template = manager.prepare(os.path.basename(template_file))
-            # Read the configuration
-            output_dir = self.tmpl_config_get(template_file,
-                                         "output_dir", OUTPUT_DIR)
-            date_format = self.tmpl_config_get(template_file,
-                                          "date_format", DATE_FORMAT, raw=1)
-            encoding = self.tmpl_config_get(template_file, "encoding", ENCODING)
-        
-            # We treat each template individually
-            base = os.path.splitext(os.path.basename(template_file))[0]
-            url = os.path.join(planet_link, base)
-            output_file = os.path.join(output_dir, base)
-
-            # Gather information
-            channels, channels_list = self.gather_channel_info(template_file) 
-            items_list = self.gather_items_info(channels, template_file) 
-
-            # Gather item information
-    
-            # Process the template
-            tp = htmltmpl.TemplateProcessor(html_escape=0)
-            tp.set("Items", items_list)
-            tp.set("Channels", channels_list)
-        
-            # Generic information
-            tp.set("generator",   VERSION)
-            tp.set("name",        planet_name)
-            tp.set("link",        planet_link)
-            tp.set("owner_name",  owner_name)
-            tp.set("owner_email", owner_email)
-            tp.set("url",         url)
-            tp.set("repo_url", __url__)
-        
-            if planet_feed:
-                tp.set("feed", planet_feed)
-                tp.set("feedtype", planet_feed.find('rss')>=0 and 'rss' or 'atom')
-            
-            # Update time
-            date = time.gmtime()
-            tp.set("date",        time.strftime(date_format, date))
-            tp.set("date_iso",    time.strftime(TIMEFMT_ISO, date))
-            tp.set("date_822",    time.strftime(TIMEFMT_822, date))
-
-            try:
-                log.info("Writing %s", output_file)
-                output_fd = open(output_file, "w")
-                if encoding.lower() in ("utf-8", "utf8"):
-                    # UTF-8 output is the default because we use that internally
-                    output_fd.write(tp.process(template))
-                elif encoding.lower() in ("xml", "html", "sgml"):
-                    # Magic for Python 2.3 users
-                    output = tp.process(template).decode("utf-8")
-                    output_fd.write(output.encode("ascii", "xmlcharrefreplace"))
-                else:
-                    # Must be a "known" encoding
-                    output = tp.process(template).decode("utf-8")
-                    output_fd.write(output.encode(encoding, "replace"))
-                output_fd.close()
-            except KeyboardInterrupt:
-                raise
-            except:
-                log.exception("Write of %s failed", output_file)
+            render.render_template(template_file, planet_name,
+                planet_link, planet_feed, owner_name, owner_email, output_dir, date_format, encoding, channels_list, items_list)
 
     def channels(self, hidden=0, sorted=1):
         """Return the list of channels."""
