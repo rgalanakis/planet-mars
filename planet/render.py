@@ -2,6 +2,8 @@ import logging
 import os
 import time
 
+import jinja2
+
 from . import htmltmpl
 from .constants import __url__, TIMEFMT_ISO, TIMEFMT_822, VERSION
 
@@ -24,8 +26,12 @@ def render_template(
     log.info("Processing template %s", template_file)
     
     # We treat each template individually
-    base = os.path.splitext(os.path.basename(template_file))[0]
-    url = os.path.join(planet_link, base)
+    base = os.path.basename(template_file)
+    # Templates may be '.html' or '.html.tmpl', etc.
+    # Don't throw away the last extension.
+    if base.count('.') > 1:
+        base = os.path.splitext(base)[0]
+    url = os.path.join(planet_link, base).replace('\\', '/')
     output_file = os.path.join(output_dir, base)
     
     date = time.gmtime()
@@ -53,14 +59,25 @@ def render_template(
     else:
         assert template_file.endswith('.html')
         func = render_jinja
-    return func(template_file, output_file, encoding, kwargs)
+    html = func(template_file, kwargs)
 
 
-def render_htmltmpl(
-        template_file,
-        output_file,
-        encoding,
-        template_kwargs):
+    log.info("Writing %s", output_file)
+    with open(output_file, "w") as output_fd:
+        if encoding.lower() in ("utf-8", "utf8"):
+            # UTF-8 output is the default because we use that internally
+            output_fd.write(html)
+        elif encoding.lower() in ("xml", "html", "sgml"):
+            # Magic for Python 2.3 users
+            output = html.decode("utf-8")
+            output_fd.write(output.encode("ascii", "xmlcharrefreplace"))
+        else:
+            # Must be a "known" encoding
+            output = html.decode("utf-8")
+            output_fd.write(output.encode(encoding, "replace"))
+
+
+def render_htmltmpl(template_file, template_kwargs):
     manager = htmltmpl.TemplateManager()
     try:
         template = manager.prepare(template_file)
@@ -72,20 +89,22 @@ def render_htmltmpl(
     for key, val in template_kwargs.iteritems():
         tp.set(key, val)
 
-    log.info("Writing %s", output_file)
-    with open(output_file, "w") as output_fd:
-        if encoding.lower() in ("utf-8", "utf8"):
-            # UTF-8 output is the default because we use that internally
-            output_fd.write(tp.process(template))
-        elif encoding.lower() in ("xml", "html", "sgml"):
-            # Magic for Python 2.3 users
-            output = tp.process(template).decode("utf-8")
-            output_fd.write(output.encode("ascii", "xmlcharrefreplace"))
-        else:
-            # Must be a "known" encoding
-            output = tp.process(template).decode("utf-8")
-            output_fd.write(output.encode(encoding, "replace"))
+    return tp.process(template)
 
 
-def render_jinja(*args, **kwargs):
-    raise NotImplementedError()
+def render_jinja(template_file, template_kwargs):
+    for key in 'Items', 'Channels':
+        newobjs = []
+        for oldobj in template_kwargs[key]:
+            newobj = {}
+            for k, v in oldobj.iteritems():
+                if isinstance(v, str):
+                    v = v.decode('utf8')
+                newobj[k] = v
+            newobjs.append(newobj)
+        template_kwargs[key] = newobjs
+
+    with open(template_file) as f:
+        template = jinja2.Template(f.read())
+    html = template.render(**template_kwargs)
+    return html.encode('utf8')

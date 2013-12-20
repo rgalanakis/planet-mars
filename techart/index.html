@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>{{ name }}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="generator" content="{{ generator }}">
+    <link rel="stylesheet" href="planet.css" type="text/css">
+    {% if feedtype %}
+    <link rel="alternate" href="{{ feed }}" title="{{ channel_title_plain }}" type="application/{{ feedtype }}+xml">
+    {% endif %}
+</head>
+
+<body>
+    <div class="logo"><img src="images/logo.gif" alt="homepage" border="0" /></div>
+
+    <div class="pagetitle">{{ name }}</div>
+    <div class="lastupdated">Last update: {{ date }}</div>
+
+    {% for item in Items %}
+        {% if item.new_date %}
+        <div class="daygroup">
+            <div class="dayheader">{{ item.new_date }}</div>
+            <hr class="dayhr"/>
+        {% endif %}
+
+            {% if item.new_channel %}
+            <div class="channelgroup">
+                <div class="authorheader"><a href="{{ item.channel_link }}" title="{{ item.channel_title_plain }}">{{ item.channel_name }}</a></div>
+            {% endif %}
+
+                <div class="entrygroup" id="{{ item.id }}"><!--channel_language-->
+                    {% if item.title %}
+                    <h4><a href="{{ item.link }}">{{ item.title }}</a></h4> <!--title_language-->
+                    {% endif %}
+                    <div class="entry">
+                        <div class="content"> <!--content_language-->{{ item.content }}</div>
+                        <p class="date"><a href="{{ item.link }}">by {{ item.author }} at {{ item.date }}</a></p>
+                    </div>
+                    <hr class="posthr" />
+                </div>
+
+        {% if loop.last %}
+            </div></div>
+        {% else %}
+            {% if Items[loop.index0 + 1].new_channel %}
+                </div>
+            {% endif %}
+            {% if Items[loop.index0 + 1].new_date %}
+                </div>
+            {% endif %}
+        {% endif %}
+
+    {% endfor %}
+
+
+    <div class="sidebar">
+
+        <div class="sidebarheader">Feeds</div>
+        <ul>
+            <li><a href="rss20.xml"><img src="images/feed-icon-10x10.png" alt="(feed)">  RSS</a></li>
+        </ul>
+
+		<div class="addyourself">To request addition or removal:<br />{{ owner_email }}</div>
+        <div class="sidebarheader">Subscriptions</div>
+        <ul>
+            {% for channel in Channels %}
+            <li>
+                <a href="{{ channel.url }}" title="subscribe"><img src="images/feed-icon-10x10.png" alt="(feed)"></a>
+                <a href="{{ channel.link }}" title="{{ channel.title_plain }}">{{ channel.name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <p class="addyourself"><a href="{{ repo_url }}">Get the code.</a></p>
+    </div>
+</body>
+
+</html>
