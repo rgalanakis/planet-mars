@@ -21,10 +21,9 @@ from xml.sax.saxutils import escape
 import feedparser
 import sanitize
 
-from . import cache, htmltmpl
+from . import cache, htmltmpl, render
 
 
-# Limit the effect of "from planet import *"
 __all__ = ("cache", "feedparser", "htmltmpl", "logging",
            "Planet", "Channel", "NewsItem")
 

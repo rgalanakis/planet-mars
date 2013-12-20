@@ -11,10 +11,12 @@ def timestr():
     return time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())
 
 
-def create_files():
+def create_files(verbose=False):
     print timestr(), 'Creating files'
     # Using '-m planet' fails under debugger, cannot run __main__
-    args = ['python', 'planet\\__main__.py', 'techart/fancy/config.ini']
+    args = ['python', 'planet\\__main__.py', 'techart/config.ini']
+    if verbose:
+        args.append('-v')
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     print out
@@ -55,8 +57,9 @@ def main():
     o = argparse.ArgumentParser()
     o.add_argument('--ftppass')
     o.add_argument('--copyto')
+    o.add_argument('-v', '--verbose', action='store_true')
     opts = o.parse_args()
-    create_files()
+    create_files(opts.verbose)
     if opts.copyto:
         print 'Copying output to', opts.copyto
         copy_files(opts.copyto)
