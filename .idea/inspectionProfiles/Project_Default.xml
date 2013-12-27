@@ -1,0 +1,43 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0" is_locked="false">
+    <option name="myName" value="Project Default" />
+    <option name="myLocal" value="false" />
+    <inspection_tool class="PyBroadExceptionInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyMethodMayBeStaticInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyPep8Inspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyPep8NamingInspection" enabled="false" level="INFO" enabled_by_default="false" />
+    <inspection_tool class="PyProtectedMemberInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyShadowingBuiltinsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredNames">
+        <list>
+          <option value="credits" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <value>
+          <list size="10">
+            <item index="0" class="java.lang.String" itemvalue="wgeo2.*" />
+            <item index="1" class="java.lang.String" itemvalue="pymel.core.general.PyNode.*" />
+            <item index="2" class="java.lang.String" itemvalue="PyQt4.QtCore.pyqtSignal.emit" />
+            <item index="3" class="java.lang.String" itemvalue="PyQt4.QtCore.pyqtSignal.connect" />
+            <item index="4" class="java.lang.String" itemvalue="sm" />
+            <item index="5" class="java.lang.String" itemvalue="session" />
+            <item index="6" class="java.lang.String" itemvalue="boot" />
+            <item index="7" class="java.lang.String" itemvalue="devenv.libconst.*" />
+            <item index="8" class="java.lang.String" itemvalue="eve.client.script.parklife.fxSequencer.settings" />
+            <item index="9" class="java.lang.String" itemvalue="basestring.replace" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
+      <option name="processCode" value="true" />
+      <option name="processLiterals" value="true" />
+      <option name="processComments" value="true" />
+    </inspection_tool>
+    <inspection_tool class="SqlDialectInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="SqlNoDataSourceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+  </profile>
+</component>

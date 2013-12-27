@@ -11,6 +11,7 @@ import locale
 import logging
 import socket
 import sys
+import time
 
 import planet
 from planet.constants import REQUIRED_OPTIONS
@@ -54,6 +55,7 @@ def set_locale(localestr):
 
 
 def main():
+    starttime = time.clock()
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='DEBUG level logging during update.')
@@ -74,7 +76,6 @@ def main():
 
     # Read the [Planet] config section
     planet_options = dict(config.items('Planet'))
-    planet_options['template_files'] = planet_options['template_files'].split(' ')
 
     # Define locale
     try:
@@ -87,7 +88,7 @@ def main():
     feed_timeout = planet_options['feed_timeout']
     try:
         feed_timeout = float(feed_timeout)
-    except:
+    except Exception:
         sys.stderr.write("Feed timeout set to invalid value '%s', skipping.\n"
                          % feed_timeout)
         sys.exit(6)
@@ -99,12 +100,14 @@ def main():
     # run the planet
     planet_name = planet_options['name']
     planet_link = planet_options['link']
-    template_files = planet_options.pop('template_files')
+    template_files = planet_options['template_files'].split(' ')
 
     my_planet = planet.Planet(config)
     my_planet.run(planet_name, planet_link, template_files, opts.offline)
 
     my_planet.generate_all_files(template_files, planet_options)
+    duration = time.clock() - starttime
+    log.info('Took %ss to generate.', duration)
 
 
 if __name__ == "__main__":

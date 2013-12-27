@@ -13,9 +13,6 @@ simple alternative to other Python-based Planet aggregators,
 such as the lovely **Planet Venus** 
 ( http://www.intertwingly.net/code/venus/ ), 
 which is much more full featured.
-It is focused on being the simplest Python Planet-based
-feed aggregator, much simpler than the original or
-more full featured alternatives.
 
 **Planet Mars** uses Jinja2 for its templating engine,
 though htmltmpl (based on Perl's ``HTML::Template`` module)
@@ -146,6 +143,13 @@ name (e.g. 'channel_name' and 'channel_link').
 Depending on the feed, there may be a huge variety of other
 variables may be available; the best way to find out what you
 have is using the 'planet-cache' tool to examine your cache files.
+
+Threading
+=========
+
+Updating of feeds can use ``multiprocessing.pool.ThreadPool`` to speed things
+up. It can have a significant effect!
+See the ``threads`` option in the config file to enable it.
 
 Contributing
 ------------

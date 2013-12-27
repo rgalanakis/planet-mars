@@ -278,19 +278,25 @@ class CachedInfo(object):
         else:
             raise AttributeError, key
 
+    def __str__(self):
+        t = type(self)
+        return '<%s.%s(%s)>' % (t.__module__, t.__name__, self._id)
 
-def filename(directory, filename):
+    __repr__ = __str__
+
+
+def filename(directory, tail):
     """Return a filename suitable for the cache.
 
     Strips dangerous and common characters to create a filename we
     can use to store the cache in.
     """
-    filename = re_url_scheme.sub("", filename)
-    filename = re_slash.sub(",", filename)
-    filename = re_initial_cruft.sub("", filename)
-    filename = re_final_cruft.sub("", filename)
+    result = re_url_scheme.sub("", tail)
+    result = re_slash.sub(",", result)
+    result = re_initial_cruft.sub("", result)
+    result = re_final_cruft.sub("", result)
 
-    return os.path.join(directory, filename)
+    return os.path.join(directory, result)
 
 def utf8(value):
     """Return the value as a UTF-8 string."""
