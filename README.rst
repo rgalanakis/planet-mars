@@ -1,22 +1,79 @@
-planet-jinja
----------------
+Planet Mars
+-----------
 
-This is a fork of the Python planet software available at
-http://www.planetplanet.org/
+Planet is a flexible feed aggregator.
+It downloads news feeds published by web sites and
+aggregates their content together into a single combined feed,
+latest news first.
 
-It will soon be modified to use Jinja2 instead of htmltmpl,
-and has been cleaned up in a number of other ways
-based on my experience using Planet.
+This is a fork of the Python planet feed aggregator
+originally available at http://www.planetplanet.org/
+It is focused on being the simplest Python Planet-based
+feed aggregator, much simpler than the original or
+more full featured alternatives.
 
-TODO
-----
+Planet Mars uses Jinja2 for its templating engine,
+though htmltmpl (based on Perl's HTML::Template module)
+is still supported.
+If you want Django or another templating engine,
+just put in a ticket,
+it should be pretty easy.
 
-This package is not nearly finished.
-The two primary items are:
+Installation
+------------
 
-- Convert to Jinja2
-- Remove the 'techart' stuff that was originall created for
-  tech-artists.org.
+This software is pretty simple and Python 2.6 and
+later should work.
+
+To install Planet Mars, you can just use
+``pip`` or ``easy_install``.
+There are a few dependencies that should be installed
+if you don't have them already.
+These aren't cutting edge dependencies so even older
+versions should be fine.
+
+Compatibility with Python version will depend mostly
+on what version of Jinja2 you are going to use.
+See Jinja's installation FAQ at
+http://jinja.pocoo.org/docs/intro/#prerequisites
+
+Usage
+-----
+
+Generally usage is split into two parts:
+setup and generation.
+Setup is only done when setting up your site,
+and generation is done on some schedule.
+
+Setup
+&&&&&
+
+1. Copy ``template.ini`` to create your configuration file.
+   The ``.ini`` file is heavily commented and should guide
+   you through how to customize it.
+2. Create your template files for your HTML page or pages.
+   The feed templates are provided by Planet,
+   you just need to provide your html templates.
+3. Create the supporting files your html page links to,
+   like images and CSS.
+3. Point to your template file(s) from your ``.ini`` file.
+4. You're done!
+
+Generation
+&&&&&&&&&&
+
+Create some script to call ``python -m planet /path/to/config.ini``
+on a schedule.
+
+Contributing
+------------
+
+My guess is the feature missing from Planet Mars is support
+for some templating engine you want.
+Just add support for it to ``planet/render.py``,
+or put in a ticket and ask me to do it.
+It should be really easy to add in support for other rendering
+engines than Jinja2 and htmltmpl.
 
 Author
 ------
