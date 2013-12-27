@@ -209,8 +209,7 @@ class Planet(object):
             except:
                 log.exception("Update of <%s> failed", feed_url)
 
-    def generate_all_files(self, template_files, planet_name,
-                planet_link, planet_feed, owner_name, owner_email):
+    def generate_all_files(self, template_files, planet_kwargs):
 
         # Read the configuration
         output_dir = self.tmpl_config_get("output_dir", OUTPUT_DIR)
@@ -224,16 +223,12 @@ class Planet(object):
             try:
                 render.render_template(
                     template_file,
-                    planet_name,
-                    planet_link,
-                    planet_feed,
-                    owner_name,
-                    owner_email,
                     output_dir,
                     date_format,
                     encoding,
                     channels_list,
-                    items_list)
+                    items_list,
+                    planet_kwargs)
             except Exception:
                 log.exception('Write failed for %s', template_file)
 

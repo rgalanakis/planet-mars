@@ -5,7 +5,7 @@ import time
 import jinja2
 
 from . import htmltmpl
-from .constants import __url__, TIMEFMT_ISO, TIMEFMT_822, VERSION
+from .constants import TIMEFMT_ISO, TIMEFMT_822, VERSION
 
 
 log = logging.getLogger(__name__)
@@ -13,16 +13,17 @@ log = logging.getLogger(__name__)
 
 def render_template(
         template_file,
-        planet_name,
-        planet_link,
-        planet_feed,
-        owner_name,
-        owner_email,
         output_dir,
         date_format,
         encoding,
         channels_list,
-        items_list):
+        items_list,
+        planet_kwargs):
+    """Render a template file.
+    Chooses renderer based on template_file extension.
+
+    :param planet_kwargs: Extra Planet-level parameters in the config.
+    """
     log.info("Processing template %s", template_file)
     
     # We treat each template individually
@@ -31,34 +32,29 @@ def render_template(
     # Don't throw away the last extension.
     if base.count('.') > 1:
         base = os.path.splitext(base)[0]
-    url = os.path.join(planet_link, base).replace('\\', '/')
+    url = os.path.join(planet_kwargs['link'], base).replace('\\', '/')
     output_file = os.path.join(output_dir, base)
     
     date = time.gmtime()
-    kwargs = {
+    kwargs = dict(planet_kwargs)
+    kwargs.update({
         'Items': items_list,
         'Channels': channels_list,
         'generator': VERSION,
-        'name': planet_name,
-        'link': planet_link,
-        'owner_name': owner_name,
-        'owner_email': owner_email,
         'url': url,
-        'repo_url': __url__,
         'date': time.strftime(date_format, date),
         'date_iso': time.strftime(TIMEFMT_ISO, date),
         'date_822': time.strftime(TIMEFMT_822, date)
-    }
-        
-    if planet_feed:
-        kwargs['feed'] = planet_feed
-        kwargs['feedtype'] = planet_feed.find('rss')>=0 and 'rss' or 'atom'
+    })
+
+    kwargs['feedtype'] = kwargs['feed'].find('rss')>=0 and 'rss' or 'atom'
 
     if template_file.endswith('.tmpl'):
         func = render_htmltmpl
     else:
         assert template_file.endswith('.html')
         func = render_jinja
+    assert 'template_files'  not in kwargs
     html = func(template_file, kwargs)
 
 

@@ -1,144 +1,111 @@
 #!/usr/bin/env python
-"""The Planet aggregator.
+"""
+The Planet aggregator.
 
 A flexible and easy-to-use aggregator for generating websites.
 """
 
-
-from ConfigParser import ConfigParser
+import argparse
+import ConfigParser
 import locale
-import os
+import logging
 import socket
 import sys
-import urlparse
 
 import planet
+from planet.constants import REQUIRED_OPTIONS
+
+log = logging.getLogger('planet.runner')
 
 
-# Default configuration file path
-CONFIG_FILE = "config.ini"
+def read_config(config_file):
+    """Reads and performs validation of config."""
+    config = ConfigParser.ConfigParser()
+    config.read(config_file)
+    if not config.has_section('Planet'):
+        sys.stderr.write('Config must have a [Planet] section. Exiting.\n')
+        sys.exit(3)
+    for o in REQUIRED_OPTIONS:
+        if not config.has_option('Planet', o):
+            sys.stderr.write(
+                '[Planet] section missing required option %r. '
+                'Check example/config.ini for an example. '
+                'Exiting.\n' % o)
+            sys.exit(4)
+    return config
 
-# Defaults for the [Planet] config section
-PLANET_NAME = "Unconfigured Planet"
-PLANET_LINK = "Unconfigured Planet"
-PLANET_FEED = None
-OWNER_NAME  = "Anonymous Coward"
-OWNER_EMAIL = ""
-LOG_LEVEL   = "WARNING"
-FEED_TIMEOUT = 20 # seconds
 
-# Default template file list
-TEMPLATE_FILES = "examples/basic/planet.html.tmpl"
+def set_locale(localestr):
+    # The user can specify more than one locale (separated by ":") as
+    # fallbacks.
+    locale_ok = False
+    for user_locale in localestr.split(':'):
+        user_locale = user_locale.strip()
+        try:
+            locale.setlocale(locale.LC_ALL, user_locale)
+        except locale.Error:
+            pass
+        else:
+            locale_ok = True
+            break
+    if not locale_ok:
+        sys.stderr.write("Unsupported locale setting.\n")
+        sys.exit(5)
 
-
-
-def config_get(config, section, option, default=None, raw=0, vars=None):
-    """Get a value from the configuration, with a default."""
-    if config.has_option(section, option):
-        return config.get(section, option, raw=raw, vars=None)
-    else:
-        return default
 
 def main():
-    config_file = CONFIG_FILE
-    offline = 0
-    verbose = 0
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='DEBUG level logging during update.')
+    parser.add_argument('-o', '--offline', action='store_true',
+                        help='Update the Planet from the cache only.')
+    parser.add_argument('config_file', help='Path to configuration ini file.')
+    opts = parser.parse_args()
 
-    for arg in sys.argv[1:]:
-        if arg == "-h" or arg == "--help":
-            print "Usage: planet [options] [CONFIGFILE]"
-            print
-            print "Options:"
-            print " -v, --verbose       DEBUG level logging during update"
-            print " -o, --offline       Update the Planet from the cache only"
-            print " -h, --help          Display this help message and exit"
-            print
-            sys.exit(0)
-        elif arg == "-v" or arg == "--verbose":
-            verbose = 1
-        elif arg == "-o" or arg == "--offline":
-            offline = 1
-        elif arg.startswith("-"):
-            print >>sys.stderr, "Unknown option:", arg
-            sys.exit(1)
-        else:
-            config_file = arg
+    config = read_config(opts.config_file)
 
-    # Read the configuration file
-    config = ConfigParser()
-    config.read(config_file)
-    if not config.has_section("Planet"):
-        print >>sys.stderr, "Configuration missing [Planet] section."
-        sys.exit(1)
+    if opts.verbose:
+        log_level = "DEBUG"
+    elif config.has_option('Planet', 'log_level'):
+        log_level = config.get('Planet', 'log_level')
+    else:
+        log_level = logging.WARN
+    logging.basicConfig(level=logging.getLevelName(log_level))
 
     # Read the [Planet] config section
-    planet_name = config_get(config, "Planet", "name", PLANET_NAME)
-    planet_link = config_get(config, "Planet", "link", PLANET_LINK)
-    planet_feed = config_get(config, "Planet", "feed", PLANET_FEED)
-    owner_name  = config_get(config, "Planet", "owner_name", OWNER_NAME)
-    owner_email = config_get(config, "Planet", "owner_email", OWNER_EMAIL)
-    if verbose:
-        log_level = "DEBUG"
-    else:
-        log_level  = config_get(config, "Planet", "log_level", LOG_LEVEL)
-    feed_timeout   = config_get(config, "Planet", "feed_timeout", FEED_TIMEOUT)
-    template_files = config_get(config, "Planet", "template_files",
-                                TEMPLATE_FILES).split(" ")
-
-    # Default feed to the first feed for which there is a template
-    if not planet_feed:
-        for template_file in template_files:
-            name = os.path.splitext(os.path.basename(template_file))[0]
-            if name.find('atom')>=0 or name.find('rss')>=0:
-                planet_feed = urlparse.urljoin(planet_link, name)
-                break
+    planet_options = dict(config.items('Planet'))
+    planet_options['template_files'] = planet_options['template_files'].split(' ')
 
     # Define locale
-    if config.has_option("Planet", "locale"):
-        # The user can specify more than one locale (separated by ":") as
-        # fallbacks.
-        locale_ok = False
-        for user_locale in config.get("Planet", "locale").split(':'):
-            user_locale = user_locale.strip()
-            try:
-                locale.setlocale(locale.LC_ALL, user_locale)
-            except locale.Error:
-                pass
-            else:
-                locale_ok = True
-                break
-        if not locale_ok:
-            print >>sys.stderr, "Unsupported locale setting."
-            sys.exit(1)
-
-    # Activate logging
-    planet.logging.basicConfig()
-    planet.logging.getLogger().setLevel(planet.logging.getLevelName(log_level))
-    log = planet.logging.getLogger("planet.runner")
     try:
-        log.warning
+        localestr = config.get('Planet', 'locale')
+    except ConfigParser.NoOptionError:
+        pass
+    else:
+        set_locale(localestr)
+
+    feed_timeout = planet_options['feed_timeout']
+    try:
+        feed_timeout = float(feed_timeout)
     except:
-        log.warning = log.warn
+        sys.stderr.write("Feed timeout set to invalid value '%s', skipping.\n"
+                         % feed_timeout)
+        sys.exit(6)
 
-    if feed_timeout:
-        try:
-            feed_timeout = float(feed_timeout)
-        except:
-            log.warning("Feed timeout set to invalid value '%s', skipping", feed_timeout)
-            feed_timeout = None
-
-    if feed_timeout and not offline:
+    if not opts.offline:
         socket.setdefaulttimeout(feed_timeout)
         log.debug("Socket timeout set to %d seconds", feed_timeout)
 
     # run the planet
-    my_planet = planet.Planet(config)
-    my_planet.run(planet_name, planet_link, template_files, offline)
+    planet_name = planet_options['name']
+    planet_link = planet_options['link']
+    template_files = planet_options.pop('template_files')
 
-    my_planet.generate_all_files(template_files, planet_name,
-        planet_link, planet_feed, owner_name, owner_email)
+    my_planet = planet.Planet(config)
+    my_planet.run(planet_name, planet_link, template_files, opts.offline)
+
+    my_planet.generate_all_files(template_files, planet_options)
 
 
 if __name__ == "__main__":
     main()
-
