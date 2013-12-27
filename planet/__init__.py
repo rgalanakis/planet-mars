@@ -289,7 +289,8 @@ class Planet(object):
             
         items = []
         seen_guids = {}
-        if not channels: channels=self.channels(hidden=hidden, sorted=0)
+        if not channels:
+            channels=self.channels(hidden=hidden, sorted=0)
         for channel in channels:
             for item in channel._items.values():
                 if hidden or not item.has_key("hidden"):

@@ -13,9 +13,6 @@ simple alternative to other Python-based Planet aggregators,
 such as the lovely **Planet Venus** 
 ( http://www.intertwingly.net/code/venus/ ), 
 which is much more full featured.
-It is focused on being the simplest Python Planet-based
-feed aggregator, much simpler than the original or
-more full featured alternatives.
 
 **Planet Mars** uses Jinja2 for its templating engine,
 though htmltmpl (based on Perl's ``HTML::Template`` module)

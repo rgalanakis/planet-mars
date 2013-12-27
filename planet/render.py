@@ -54,9 +54,7 @@ def render_template(
     else:
         assert template_file.endswith('.html')
         func = render_jinja
-    assert 'template_files'  not in kwargs
     html = func(template_file, kwargs)
-
 
     log.info("Writing %s", output_file)
     with open(output_file, "w") as output_fd:
