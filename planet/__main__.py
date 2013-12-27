@@ -74,7 +74,6 @@ def main():
 
     # Read the [Planet] config section
     planet_options = dict(config.items('Planet'))
-    planet_options['template_files'] = planet_options['template_files'].split(' ')
 
     # Define locale
     try:
@@ -99,7 +98,7 @@ def main():
     # run the planet
     planet_name = planet_options['name']
     planet_link = planet_options['link']
-    template_files = planet_options.pop('template_files')
+    template_files = planet_options['template_files'].split(' ')
 
     my_planet = planet.Planet(config)
     my_planet.run(planet_name, planet_link, template_files, opts.offline)
