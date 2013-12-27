@@ -278,6 +278,12 @@ class CachedInfo(object):
         else:
             raise AttributeError, key
 
+    def __str__(self):
+        t = type(self)
+        return '<%s.%s(%s)>' % (t.__module__, t.__name__, self._id)
+
+    __repr__ = __str__
+
 
 def filename(directory, filename):
     """Return a filename suitable for the cache.
