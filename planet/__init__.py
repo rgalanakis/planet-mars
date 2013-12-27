@@ -22,6 +22,8 @@ import sanitize
 from . import cache, render
 from .constants import __version__, TIMEFMT_ISO, TIMEFMT_822, VERSION
 
+log = logging.getLogger(__name__)
+
 # Default User-Agent header to send when retreiving feeds
 USER_AGENT = VERSION + " " + feedparser.USER_AGENT
 
@@ -32,10 +34,6 @@ CACHE_DIRECTORY = "cache"
 NEW_FEED_ITEMS = 10
 
 
-
-# Log instance to use here
-log = logging.getLogger(__name__)
-
 # Defaults for the template file config sections
 ENCODING = "utf-8"
 ITEMS_PER_PAGE = 60
@@ -44,6 +42,11 @@ OUTPUT_DIR = "output"
 DATE_FORMAT = "%B %d, %Y %I:%M %p"
 NEW_DATE_FORMAT = "%B %d, %Y"
 ACTIVITY_THRESHOLD = 0
+
+try:
+    from multiprocessing.pool import ThreadPool
+except ImportError:
+    ThreadPool = None
 
 class stripHtml(sgmllib.SGMLParser):
     """remove all tags from the data"""
@@ -178,7 +181,7 @@ class Planet(object):
 
         return items_list
 
-    def run(self, planet_name, planet_link, template_files, offline = False):
+    def run(self, planet_name, planet_link, template_files, offline=False):
 
         # Create a planet
         log.info("Loading cached data")
@@ -191,21 +194,32 @@ class Planet(object):
         if self.config.has_option("Planet", "filter"):
             self.filter = self.config.get("Planet", "filter")
 
-        # The other configuration blocks are channels to subscribe to
-        for feed_url in self.config.sections():
-            if feed_url == "Planet" or feed_url in template_files:
-                continue
+        threadcount = int(self.tmpl_config_get('threads', 1))
+        mapper = map
+        if threadcount > 1:
+            if ThreadPool is None:
+                log.warning('Could not import multiprocessing.pool, '
+                            'cannot use parallel channel updating.')
+            else:
+                log.debug('Updating channels using %s threads', threadcount)
+                pool = ThreadPool(threadcount)
+                mapper = pool.map
 
+        # The other configuration blocks are channels to subscribe to
+        urls = [url for url in self.config.sections()
+                if url != 'Planet' and url not in template_files]
+
+        def update_channel(feed_url):
             # Create a channel, configure it and subscribe it
             channel = Channel(self, feed_url)
             self.subscribe(channel)
-
-            # Update it
             try:
                 if not offline and not channel.url_status == '410':
                     channel.update()
             except Exception:
-                log.exception("Update of <%s> failed", feed_url)
+                log.exception("Update of <%s> failed", channel.url)
+
+        mapper(update_channel, urls)
 
     def generate_all_files(self, template_files, planet_kwargs):
 
@@ -555,10 +569,10 @@ class Channel(cache.CachedInfo):
         self.url_etag = info.get('etag')
         self.url_modified = info.get('updated_parsed')
         if self.url_etag is not None:
-            log.debug("E-Tag: %s", self.url_etag)
+            log.debug("%s E-Tag: %s", self.url, self.url_etag)
         if self.url_modified is not None:
-            log.debug("Last Modified: %s",
-                      time.strftime(TIMEFMT_ISO, self.url_modified))
+            log.debug("%s Last Modified: %s",
+                      self.url, time.strftime(TIMEFMT_ISO, self.url_modified))
 
         self.update_info(info.feed)
         self.update_entries(info.entries)
@@ -681,7 +695,7 @@ class Channel(cache.CachedInfo):
 
         # Check for expired or replaced items
         feed_count = len(feed_items)
-        log.debug("Items in Feed: %d", feed_count)
+        log.debug("%s has items in feed: %d", self.url, feed_count)
         for item in self.items(sort=True):
             if feed_count < 1:
                 break
@@ -692,7 +706,7 @@ class Channel(cache.CachedInfo):
                 self._expired.append(item)
                 log.debug("Removed expired or replaced item <%s>", item.id)
 
-    def get_name(self):
+    def get_name(self, _):
         """Return the key containing the name."""
         for key in ("name", "title"):
             if self.has_key(key) and self.key_type(key) != self.NULL:
@@ -851,7 +865,7 @@ class NewsItem(cache.CachedInfo):
         self.set_as_date(key, date)
         return date
 
-    def get_content(self):
+    def get_content(self, _):
         """Return the key containing the content."""
         for key in ("content", "tagline", "summary"):
             if self.has_key(key) and self.key_type(key) != self.NULL:

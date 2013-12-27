@@ -144,6 +144,13 @@ Depending on the feed, there may be a huge variety of other
 variables may be available; the best way to find out what you
 have is using the 'planet-cache' tool to examine your cache files.
 
+Threading
+=========
+
+Updating of feeds can use ``multiprocessing.pool.ThreadPool`` to speed things
+up. It can have a significant effect!
+See the ``threads`` option in the config file to enable it.
+
 Contributing
 ------------
 
