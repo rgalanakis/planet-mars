@@ -86,7 +86,7 @@ def main():
     feed_timeout = planet_options['feed_timeout']
     try:
         feed_timeout = float(feed_timeout)
-    except:
+    except Exception:
         sys.stderr.write("Feed timeout set to invalid value '%s', skipping.\n"
                          % feed_timeout)
         sys.exit(6)

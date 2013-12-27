@@ -115,13 +115,13 @@ class Planet(object):
 
         channels = {}
         channels_list = []
-        for channel in self.channels(hidden=1):
+        for channel in self.channels(hidden=True):
             channels[channel] = template_info(channel, date_format)
             channels_list.append(channels[channel])
 
             # identify inactive feeds
             if activity_horizon:
-                latest = channel.items(sorted=1)
+                latest = channel.items(sort=True)
                 if len(latest)==0 or latest[0].date < activity_horizon:
                     channels[channel]["message"] = \
                         "no activity in %d days" % activity_threshold
@@ -204,9 +204,7 @@ class Planet(object):
             try:
                 if not offline and not channel.url_status == '410':
                     channel.update()
-            except KeyboardInterrupt:
-                raise
-            except:
+            except Exception:
                 log.exception("Update of <%s> failed", feed_url)
 
     def generate_all_files(self, template_files, planet_kwargs):
@@ -232,14 +230,14 @@ class Planet(object):
             except Exception:
                 log.exception('Write failed for %s', template_file)
 
-    def channels(self, hidden=0, sorted=1):
+    def channels(self, hidden=False, sort=True):
         """Return the list of channels."""
         channels = []
         for channel in self._channels:
             if hidden or not channel.has_key("hidden"):
                 channels.append((channel.name, channel))
 
-        if sorted:
+        if sort:
             channels.sort()
 
         return [ c[-1] for c in channels ]
@@ -256,7 +254,8 @@ class Planet(object):
         """Unsubscribe the planet from the channel."""
         self._channels.remove(channel)
 
-    def items(self, hidden=0, sorted=1, max_items=0, max_days=0, channels=None):
+    def items(self, hidden=False, sort=True,
+              max_items=0, max_days=0, channels=None):
         """Return an optionally filtered list of items in the channel.
 
         The filters are applied in the following order:
@@ -264,14 +263,14 @@ class Planet(object):
         If hidden is true then items in hidden channels and hidden items
         will be returned.
 
-        If sorted is true then the item list will be sorted with the newest
+        If sort is true then the item list will be sorted with the newest
         first.
 
         If max_items is non-zero then this number of items, at most, will
         be returned.
 
         If max_days is non-zero then any items older than the newest by
-        this number of days won't be returned.  Requires sorted=1 to work.
+        this number of days won't be returned.  Requires sort=True to work.
 
 
         The sharp-eyed will note that this looks a little strange code-wise,
@@ -290,7 +289,7 @@ class Planet(object):
         items = []
         seen_guids = {}
         if not channels:
-            channels=self.channels(hidden=hidden, sorted=0)
+            channels=self.channels(hidden=hidden, sort=False)
         for channel in channels:
             for item in channel._items.values():
                 if hidden or not item.has_key("hidden"):
@@ -308,7 +307,7 @@ class Planet(object):
                         title = ""
                         if item.has_key("title"):
                             title = item.title
-                        content = item.get_content("content")
+                        content = item.get_content()
 
                     if planet_filter_re:
                         if not (planet_filter_re.search(title)
@@ -335,7 +334,7 @@ class Planet(object):
                         items.append((time.mktime(item.date), item.order, item))
 
         # Sort the list
-        if sorted:
+        if sort:
             items.sort()
             items.reverse()
 
@@ -453,14 +452,14 @@ class Channel(cache.CachedInfo):
     # Special methods
     __contains__ = has_item
 
-    def items(self, hidden=0, sorted=0):
+    def items(self, hidden=False, sort=False):
         """Return the item list."""
         items = []
         for item in self._items.values():
             if hidden or not item.has_key("hidden"):
                 items.append((time.mktime(item.date), item.order, item))
 
-        if sorted:
+        if sort:
             items.sort()
             items.reverse()
 
@@ -468,7 +467,7 @@ class Channel(cache.CachedInfo):
 
     def __iter__(self):
         """Iterate the sorted item list."""
-        return iter(self.items(sorted=1))
+        return iter(self.items(sort=True))
 
     def cache_read_entries(self):
         """Read entry information from the cache."""
@@ -533,7 +532,7 @@ class Channel(cache.CachedInfo):
             try:
                 os.link(cache.filename(self._planet.cache_directory, self.url),
                         cache.filename(self._planet.cache_directory, info.url))
-            except:
+            except Exception:
                 pass
             self.url = info.url
         elif self.url_status == '304':
@@ -616,9 +615,7 @@ class Channel(cache.CachedInfo):
                         elif feed[detail].type == 'text/plain':
                             feed[key] = escape(feed[key])
                     self.set_as_string(key, feed[key])
-                except KeyboardInterrupt:
-                    raise
-                except:
+                except Exception:
                     log.exception("Ignored '%s' of <%s>, unknown format",
                                   key, self.url)
 
@@ -685,7 +682,7 @@ class Channel(cache.CachedInfo):
         # Check for expired or replaced items
         feed_count = len(feed_items)
         log.debug("Items in Feed: %d", feed_count)
-        for item in self.items(sorted=1):
+        for item in self.items(sort=True):
             if feed_count < 1:
                 break
             elif item.id in feed_items:
@@ -695,7 +692,7 @@ class Channel(cache.CachedInfo):
                 self._expired.append(item)
                 log.debug("Removed expired or replaced item <%s>", item.id)
 
-    def get_name(self, key):
+    def get_name(self):
         """Return the key containing the name."""
         for key in ("name", "title"):
             if self.has_key(key) and self.key_type(key) != self.NULL:
@@ -813,9 +810,7 @@ class NewsItem(cache.CachedInfo):
                             elif entry[detail].type == 'text/plain':
                                 entry[key] = escape(entry[key])
                     self.set_as_string(key, entry[key])
-                except KeyboardInterrupt:
-                    raise
-                except:
+                except Exception:
                     log.exception("Ignored '%s' of <%s>, unknown format",
                                   key, self.id)
 
@@ -856,7 +851,7 @@ class NewsItem(cache.CachedInfo):
         self.set_as_date(key, date)
         return date
 
-    def get_content(self, key):
+    def get_content(self):
         """Return the key containing the content."""
         for key in ("content", "tagline", "summary"):
             if self.has_key(key) and self.key_type(key) != self.NULL:
