@@ -1,5 +1,5 @@
 __version__ = "3.0"
-__url__ = 'https://github.com/rgalanakis/planet-techart'
+__url__ = 'https://github.com/rgalanakis/planet-mars'
 
 
 # Useful common date/time formats

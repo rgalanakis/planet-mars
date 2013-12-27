@@ -2,7 +2,7 @@
 """The Planet Feed Aggregator"""
 
 from distutils.core import setup
-from planet import __version__, __url__
+from planet.constants import __version__, __url__
 
 setup(name="planet-techart",
       version=__version__,
