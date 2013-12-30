@@ -2,14 +2,17 @@
 """The Planet Feed Aggregator"""
 
 from distutils.core import setup
-from planet.constants import __version__, __url__
+
+
+# version and url copied from planet.constants,
+# but because __init__ imports dependencies we cannot import it here.
 
 setup(name="planet-mars",
-      version=__version__,
+      version='3.0.0',
       description="A simpler but familiar Planet feed aggregator",
       author="Rob Galanakis",
       author_email="rob.galanakis@gmail.com",
-      url=__url__,
+      url='https://github.com/rgalanakis/planet-mars',
       license='Python',
       packages=["planet", "planet.tests"],
       install_requires=[
