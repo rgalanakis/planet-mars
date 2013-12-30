@@ -28,20 +28,9 @@ later should work.
 
 To install Planet Mars, you can just use
 ``pip`` or ``easy_install``.
-There are a few dependencies that should be installed
-if you don't have them already (``feedparser`` and ``sanitize``).
-These aren't cutting edge dependencies so even older
-versions should be fine.
+There are a few dependencies that should be installed automatically.
 
-Compatibility with Python version will depend mostly
-on what version of Jinja2 you are going to use.
-See Jinja's installation FAQ at
-http://jinja.pocoo.org/docs/intro/#prerequisites
-
-If you wish to back up your version
-(storing your config and templates in version control),
-I'd suggest forking the repo like is done for
-Planet TechArt ( https://github.com/rgalanakis/planet-techart ).
+You can then use it like a normal Python package.
 
 Usage
 -----
@@ -54,7 +43,8 @@ and generation is done on some schedule.
 Setup
 =====
 
-1. Copy the ``example`` folder and rename it to what you want for your site.
+1. Copy the ``planet/example`` folder and paste it
+   where you want to keep the file generator and your custom files.
 2. Edit ``config.ini``. The file is heavily commented and
    should guide you through how to customize it.
 3. Create your template files for your HTML page or pages
@@ -67,14 +57,20 @@ Setup
 3. Point to your template file(s) from your ``.ini`` file
    (skip this step if you just edited ``index.html``).
 4. You're done!
+   If you wish to back up your customization
+   (storing your config and templates in version control),
+   I'd suggest following the example of ``planet-techart``:
+   https://github.com/techartorg/planet-techart
 
 Generation
 ==========
 
-Create some script to call ``python -m planet /path/to/config.ini``
+Create some script to call
+``python -m planet <your folder>/config.ini``
 on a schedule.
-Then copy over ``<your folder>/output`` to
-wherever you want to serve files from.
+Then copy over ``<your folder>/output``
+(or whatever output you specified in config.ini)
+to wherever you want to serve files from.
 
 Template files
 ==============
