@@ -42,6 +42,7 @@ OUTPUT_DIR = "output"
 DATE_FORMAT = "%B %d, %Y %I:%M %p"
 NEW_DATE_FORMAT = "%B %d, %Y"
 ACTIVITY_THRESHOLD = 0
+DATE_KEYS = ("updated", "modified", "published", "issued", "created")
 
 try:
     from multiprocessing.pool import ThreadPool
@@ -73,6 +74,29 @@ def template_info(item, date_format):
         info['title_plain'] = stripHtml(info['title']).result
 
     return info
+
+
+def has_date(d):
+    """Return True if dict ``d`` has a key in ``DATE_KEYS``."""
+    for key in DATE_KEYS:
+        if key in d:
+            return True
+    return False
+
+
+def fill_dates(source, target):
+    """
+    Copy the date keys that exist in ``source`` over to ``target``,
+    along with ``_parsed`` versions if present.
+    Only needed if ``has_date(target) == False``.
+    """
+
+    for key in DATE_KEYS:
+        if key in source and key not in target:
+            target[key] = source[key]
+            pkey = key + '_parsed'
+            if pkey in source:
+                target[pkey] = source[pkey]
 
 
 class Planet(object):
@@ -574,9 +598,45 @@ class Channel(cache.CachedInfo):
             log.debug("%s Last Modified: %s",
                       self.url, time.strftime(TIMEFMT_ISO, self.url_modified))
 
+        self._fix_entry_dates(info)
         self.update_info(info.feed)
         self.update_entries(info.entries)
         self.cache_write()
+
+    def _fix_entry_dates(self, feedinfo):
+        """
+        Some feeds are poorly set up and need date information copied to
+        entries so the front page doesn't get blasted by old entries in a blog
+        that has no cache.
+        So we copy over dates from elsewhere
+        to try and make sure this doesn't happen.
+        """
+        # If there are no entries or first entry has no issue,
+        # there's nothing to do.
+        if not feedinfo.entries:
+            return
+        if has_date(feedinfo.entries[0]):
+            return
+
+        # Now we put everything into a dict, sometimes there is date
+        # info at the top level but not in .feed dict (<channel>).
+        composite = {}
+        fill_dates(feedinfo, composite)
+        fill_dates(feedinfo.feed, composite)
+
+        # We can copy over the date from feedinfo.feed
+        # (which now has the top level dates merged into it).
+        log.warn(
+            "%s entries have no date on them, date will be copied from "
+            "elsewhere in the feed info if it exists. "
+            "Feed maintainer should update their feed generation "
+            "(for example, ensure WordPress it up to date) since the "
+            "publish dates on entries will not be accurate. "
+            "If the date was present nowhere else in the feed, "
+            "your Planet's 'newest items' will be filled with old "
+            "entries from this feed.", self.url)
+        for entry in feedinfo.entries:
+            fill_dates(composite, entry)
 
     def update_info(self, feed):
         """Update information from the feed.
@@ -845,7 +905,7 @@ class NewsItem(cache.CachedInfo):
         added in previous updates and don't creep into the next one.
         """
 
-        for other_key in ("updated", "modified", "published", "issued", "created"):
+        for other_key in DATE_KEYS:
             if self.has_key(other_key):
                 date = self.get_as_date(other_key)
                 break
