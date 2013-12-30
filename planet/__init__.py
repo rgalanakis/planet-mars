@@ -99,6 +99,18 @@ def fill_dates(source, target):
                 target[pkey] = source[pkey]
 
 
+def parse_template_files(template_files_str):
+    """Parse a template files space-separated string into absolute
+    template file paths."""
+    thisdir = os.path.dirname(__file__)
+    def abs(p):
+        if p.startswith('planet/templates/'):
+            _, rest = p.split('/', 1)
+            return os.path.join(thisdir, rest)
+        return os.path.abspath(p)
+    return [abs(f) for f in template_files_str.split(' ')]
+
+
 class Planet(object):
     """A set of channels.
 

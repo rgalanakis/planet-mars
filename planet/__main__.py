@@ -100,7 +100,8 @@ def main():
     # run the planet
     planet_name = planet_options['name']
     planet_link = planet_options['link']
-    template_files = planet_options['template_files'].split(' ')
+    template_files = planet.parse_template_files(
+        planet_options['template_files'])
 
     my_planet = planet.Planet(config)
     my_planet.run(planet_name, planet_link, template_files, opts.offline)
